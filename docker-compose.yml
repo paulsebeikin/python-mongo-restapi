@@ -1,0 +1,8 @@
+version: '3.7'
+services:
+  webapp:
+    build: .
+    volumes:
+      - .:/usr/src/app/
+    ports:
+      - 5000:80
