@@ -1,70 +1,155 @@
 from flask import Flask, request
+from flask_restful import Api, Resource
 
 app = Flask(__name__)
+api = Api(app)
+
+def checkPostedData(postedData, functionName):
+    if (functionName in ["add", "subtract", "multiply"]):
+        if "x" not in postedData or "y" not in postedData:
+            return 301
+        else:
+            return 200
+    elif (functionName == 'divide'):
+        if "x" not in postedData or "y" not in postedData:
+            return 301
+        elif int(postedData["y"]) == 0:
+            return 302
+        else:
+            return 200
+
+class Add(Resource):
+    def post(self):
+        # if i get here, then the resource Add was requested using the method POST
+
+        # Step 1 : posted data
+        postedData = request.get_json()
+        
+        # Step 2 : verify validity of posted data
+        status_code = checkPostedData(postedData, "add")
+
+        if (status_code != 200):
+            return {
+                "Message" : "And error happened.",
+                "Status Code" : status_code
+            }
+
+        # if we get here then status code is 200
+        
+        # Step 3 : read in posted data variables and compute addition function
+        x = postedData["x"]
+        y = postedData["y"]
+        x = int(x)
+        y = int(y)
+        ret = x + y
+
+        # Step 4 : return result
+        return {
+            'Message' : ret,
+            'Status Code' : 200
+        }
+
+class Subtract(Resource):
+    def post(self):
+        # if i get here, then the resource Subtract was requested using the method POST
+
+        # Step 1 : posted data
+        postedData = request.get_json()
+        
+        # Step 2 : verify validity of posted data
+        status_code = checkPostedData(postedData, "subtract")
+
+        if (status_code != 200):
+            return {
+                "Message" : "And error happened.",
+                "Status Code" : status_code
+            }
+
+        # if we get here then status code is 200
+        
+        # Step 3 : read in posted data variables and compute subtraction function
+        x = postedData["x"]
+        y = postedData["y"]
+        x = int(x)
+        y = int(y)
+        ret = x - y
+
+        # Step 4 : return result
+        return {
+            'Message' : ret,
+            'Status Code' : 200
+        }
+
+class Divide(Resource):
+    def post(self):
+        # if i get here, then the resource Divide was requested using the method POST
+
+        # Step 1 : posted data
+        postedData = request.get_json()
+        
+        # Step 2 : verify validity of posted data
+        status_code = checkPostedData(postedData, "divide")
+
+        if (status_code != 200):
+            return {
+                "Message" : "And error happened.",
+                "Status Code" : status_code
+            }
+
+        # if we get here then status code is 200
+        
+        # Step 3 : read in posted data variables and compute multiplication function
+        x = postedData["x"]
+        y = postedData["y"]
+        x = int(x)
+        y = int(y)
+        ret = (x*1.0) / y
+
+        # Step 4 : return result
+        return {
+            'Message' : ret,
+            'Status Code' : 200
+        }
+
+class Multiply(Resource):
+    def post(self):
+        # if i get here, then the resource Multiply was requested using the method POST
+
+        # Step 1 : posted data
+        postedData = request.get_json()
+        
+        # Step 2 : verify validity of posted data
+        status_code = checkPostedData(postedData, "multiply")
+
+        if (status_code != 200):
+            return {
+                "Message" : "And error happened.",
+                "Status Code" : status_code
+            }
+
+        # if we get here then status code is 200
+        
+        # Step 3 : read in posted data variables and compute multiplication function
+        x = postedData["x"]
+        y = postedData["y"]
+        x = int(x)
+        y = int(y)
+        ret = x * y
+
+        # Step 4 : return result
+        return {
+            'Message' : ret,
+            'Status Code' : 200
+        }
+
+api.add_resource(Add, "/add")
+api.add_resource(Subtract, "/subtract")
+api.add_resource(Multiply, "/multiply")
+api.add_resource(Divide, "/divide")
 
 @app.route('/') # index
 def helloWorld():
     return "Hello World!!!"
-
-@app.route('/add_two_nums', methods=['POST'])
-def add_two_nums():
-    # Get x,y from posted data
-    dataDict = request.get_json()    
-    # add x+y and store in z
-    if "x" not in dataDict:
-        return "[ERROR] : x is a required field", 400
-    if "y" not in dataDict:
-        return "[ERROR] : y is a required field", 400
-    x = dataDict["x"]
-    y = dataDict["y"]
-    z = x + y
-    # prepare a JSON object, in it "z" : z
-    return {
-        "z" : z
-    }
-
-# demonstrating JSON - arrays
-@app.route('/users')
-def getUsers():
-    return {
-        'Users': [
-            {
-                'FirstName' : 'Paul',
-                'LastName' : 'Sebeikin',
-                'Logon' : 'PaulS',
-                'Admin' : 0
-            },
-            {        
-                'FirstName' : 'Amy',
-                'LastName' : 'Woolahan',
-                'Logon' : 'AmyW',
-                'Admin' : 1
-            }
-        ]
-    }
-
-@app.route('/test')
-def test():
-    name = 'Paul Sebeikin'
-    age = 7*3
-    json = {
-        'Name'  : name,
-        'Age'   : age,
-        'Phones': [
-            {
-                "Phone Type"    : "Mobile",
-                "Phone Number"  : 3231551
-            },
-            {
-                "Phone Type"    : "Home",
-                "Phone Number"  : 543342
-            }
-        ]    
-    }
-
-    return json
-
-    
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
