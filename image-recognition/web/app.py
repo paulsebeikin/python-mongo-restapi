@@ -14,7 +14,7 @@ db = client.ImageRecognition
 users = db["users"]
 
 def UserExists(username):
-    if users.find({"username": username}).count() == 0:
+    if users.count({"username": username}) == 0:
         return False
     else: 
         return True
@@ -55,6 +55,14 @@ def generateReturnDictionary(status, message):
         "message": message
     }
 
+def countTokens(username):
+    tokens = users.find(
+        { 
+            "username" : username 
+        })[0]['tokens']
+    
+    return tokens
+
 class Register(Resource):
     def post(self):
         postedData = request.get_json()
@@ -91,9 +99,7 @@ class Classify(Resource):
         if error:
             return retJson
 
-        tokens = users.find({
-            "username" : username  
-        }[0]["tokens"])
+        tokens = countTokens(username)        
 
         if tokens <= 0:
             return generateReturnDictionary(303, "Not enough tokens.")
@@ -103,7 +109,7 @@ class Classify(Resource):
 
         with open("temp.jpg", "wb") as f:
             f.write(r.content)
-            proc = subprocess.Popen('python classify_image.py --models_dir=. --image_file=./temp.jpg')
+            proc = subprocess.Popen('python classify_image.py --models_dir=. --image_file=temp.jpg', shell=True)
             proc.communicate()[0]
             proc.wait()
             with open("text.txt") as g:
@@ -119,6 +125,7 @@ class Classify(Resource):
         })
 
         return retJson
+        
         
 
 class Refill(Resource):

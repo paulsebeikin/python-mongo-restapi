@@ -3,5 +3,5 @@ flask-restful
 bcrypt
 pymongo
 numpy
-tenserflow
+tensorflow==1.15.0
 requests
